@@ -96,11 +96,11 @@ import com.mardous.booming.ui.component.compose.ButtonGroup
 import com.mardous.booming.ui.component.compose.CollapsibleAppBarScaffold
 import com.mardous.booming.ui.component.compose.ConfirmDialog
 import com.mardous.booming.ui.component.compose.DialogCheckBox
-import com.mardous.booming.ui.component.compose.DialogListItemSurface
 import com.mardous.booming.ui.component.compose.DialogListItemWithCheckBox
 import com.mardous.booming.ui.component.compose.EmptyView
 import com.mardous.booming.ui.component.compose.InputDialog
 import com.mardous.booming.ui.component.compose.MaterialSwitch
+import com.mardous.booming.ui.component.compose.ShapeableDialogListItemSurface
 import com.mardous.booming.ui.component.compose.SwitchCard
 import com.mardous.booming.ui.component.compose.TitleShapedText
 import com.mardous.booming.ui.component.compose.TitledCard
@@ -1135,9 +1135,7 @@ private fun ProfileCheckDialog(
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                LazyColumn {
                     items(profiles) { profile ->
                         if (profile.isCustom.not()) {
                             val isChecked = selectedProfiles.contains(profile)
@@ -1150,7 +1148,9 @@ private fun ProfileCheckDialog(
                                         selectedProfiles.add(profile)
                                     }
                                 },
-                                isSelected = isChecked
+                                isSelected = isChecked,
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+                                modifier = Modifier.clip(RoundedCornerShape(8.dp))
                             )
                         }
                     }
@@ -1253,7 +1253,7 @@ private fun EqualizerProfileItem(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    DialogListItemSurface(
+    ShapeableDialogListItemSurface(
         onClick = onClick,
         isSelected = isCurrentProfile,
         modifier = modifier
@@ -1320,7 +1320,7 @@ private fun AutoEqProfileItem(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    DialogListItemSurface(
+    ShapeableDialogListItemSurface(
         onClick = onClick,
         modifier = modifier
     ) {
