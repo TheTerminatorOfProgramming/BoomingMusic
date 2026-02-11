@@ -482,6 +482,8 @@
     <string name="virtualizer_label">Virtualizer</string>
     <string name="loudness_enhancer">Amplifier</string>
     <string name="sound_settings">Sound settings</string>
+    <string name="listening_on">Listening on</string>
+    <string name="casting_to">Casting to</string>
     <string name="volume_label">Volume</string>
     <string name="reset_balance">Reset balance</string>
     <string name="speed_and_pitch_label">Speed and pitch</string>
