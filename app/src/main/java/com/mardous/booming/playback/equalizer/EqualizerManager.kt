@@ -326,12 +326,12 @@ class EqualizerManager(
             context.eqDataStore.edit { prefs ->
                 val eqInitialized = prefs[Keys.EQ_INITIALIZED]
                 if (eqInitialized != true) {
+                    prefs[Keys.EQ_ENGINE_MODE] = engineMode.ordinal
                     prefs[Keys.PRESETS] = Json.encodeToString(
                         getPresetsByBandCount(engineMode.defaultBandCount)
                     )
                     prefs[Keys.EQ_INITIALIZED] = true
                 }
-                prefs[Keys.EQ_ENGINE_MODE] = engineMode.ordinal
                 prefs[Keys.EQ_SUPPORTED] = effects.any {
                     it.type == engineMode.type
                 }
@@ -668,6 +668,7 @@ class EqualizerManager(
     suspend fun setEqualizerState(state: EqState, newProfile: EqProfile? = null) {
         context.eqDataStore.edit { prefs ->
             prefs[Keys.EQ_ENABLED] = state.enabled
+            prefs[Keys.EQ_ENGINE_MODE] = state.engineMode.ordinal
             prefs[Keys.EQ_BAND_COUNT] = state.preferredBandCount
             if (newProfile != null) {
                 val serializedProfile = Json.encodeToString(newProfile)
