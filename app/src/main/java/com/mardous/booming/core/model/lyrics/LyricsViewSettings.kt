@@ -1,4 +1,4 @@
-package com.mardous.booming.ui.screen.lyrics
+package com.mardous.booming.core.model.lyrics
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Immutable
