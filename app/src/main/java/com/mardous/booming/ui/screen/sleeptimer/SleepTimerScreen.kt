@@ -179,7 +179,7 @@ fun SleepTimerBottomSheet(
                             )
                             viewModel.setTimerState(value = sliderPosition)
                         },
-                        valueRange = 1f..90f,
+                        valueRange = 1f..180f,
                         track = { sliderState ->
                             SliderDefaults.Track(
                                 sliderState = sliderState,
@@ -243,13 +243,33 @@ fun SleepTimerBottomSheet(
                                 )
                                 viewModel.setTimerState(value = 60f)
                             },
-                            shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                            shape = ShapeDefaults.Small,
                             contentPadding = PaddingValues(8.dp),
                             enabled = uiState.isRunning.not(),
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
                                 text = stringResource(R.string.sleep_timer_1_hour),
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                hapticFeedback.performHapticFeedback(
+                                    HapticFeedbackType.ContextClick
+                                )
+                                viewModel.setTimerState(value = 120f)
+                            },
+                            shape = ButtonGroupDefaults.connectedTrailingButtonShape,
+                            contentPadding = PaddingValues(8.dp),
+                            enabled = uiState.isRunning.not(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.sleep_timer_2_hour),
                                 style = MaterialTheme.typography.bodySmall,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis

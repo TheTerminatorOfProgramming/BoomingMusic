@@ -544,6 +544,7 @@
     <string name="sleep_timer_15_mins">15 mins</string>
     <string name="sleep_timer_45_mins">45 mins</string>
     <string name="sleep_timer_1_hour">1 hour</string>
+    <string name="sleep_timer_2_hour">2 hour</string>
     <string name="sleep_timer_finish_current_music">Finish last song</string>
     <string name="sleep_timer_stop_after_this_track">Stop after this track</string>
     <string name="sleep_timer_stop_after_x">Stop after %s</string>
