@@ -176,6 +176,7 @@ class LyricsViewModel(
                 BackgroundEffect.None
             } else when (preferences.getString(Key.BACKGROUND_EFFECT, null)) {
                 "gradient" -> BackgroundEffect.Gradient
+                "blur" -> BackgroundEffect.Blur
                 else -> BackgroundEffect.None
             }
         val enableSyllableLyrics = preferences.getBoolean(Key.ENABLE_SYLLABLE_LYRICS, false)

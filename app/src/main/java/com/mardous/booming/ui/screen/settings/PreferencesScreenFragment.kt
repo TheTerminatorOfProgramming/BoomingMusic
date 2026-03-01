@@ -255,6 +255,16 @@ open class PreferenceScreenFragment : PreferenceFragmentCompat(),
 
         findPreference<Preference>(ADD_EXTRA_CONTROLS)?.isVisible = !resources.isTablet
 
+        findPreference<ListPreference>(LyricsViewSettings.Key.BACKGROUND_EFFECT)?.apply {
+            if (!hasS()) {
+                val indexOfBlur = entryValues.indexOf("blur")
+                entries = entries.filterIndexed { index, _ -> index != indexOfBlur }
+                    .toTypedArray()
+                entryValues = entryValues.filterIndexed { index, _ -> index != indexOfBlur }
+                    .toTypedArray()
+            }
+        }
+
         findPreference<Preference>(LyricsViewSettings.Key.BLUR_EFFECT)
             ?.isVisible = hasS()
 
