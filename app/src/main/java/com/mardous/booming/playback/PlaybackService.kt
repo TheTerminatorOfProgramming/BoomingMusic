@@ -719,6 +719,11 @@ class PlaybackService :
     }
 
     override fun onPlayerError(error: PlaybackException) {
+        val nextMediaIndex = player.nextMediaItemIndex
+        if (nextMediaIndex != C.INDEX_UNSET) {
+            player.seekToNextMediaItem()
+            player.prepare()
+        }
         showToast(getString(R.string.playback_error_code, error.errorCodeName))
     }
 
