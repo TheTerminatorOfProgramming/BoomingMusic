@@ -17,6 +17,7 @@
 
 package com.mardous.booming.ui.screen.player.styles.plainstyle
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -40,12 +41,14 @@ import com.mardous.booming.extensions.launchAndRepeatWithViewLifecycle
 import com.mardous.booming.extensions.whichFragment
 import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
+import com.mardous.booming.util.DISPLAY_NEXT_SONG
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
 /**
  * @author Christians M. A. (mardous)
  */
-class PlainPlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_player) {
+class PlainPlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_player), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentPlainPlayerBinding? = null
     private val binding get() = _binding!!
@@ -84,6 +87,15 @@ class PlainPlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_player) {
                 }
             }
         }
+
+        Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+        playerToolbar.menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
     }
 
     private fun setupToolbar() {
@@ -92,6 +104,15 @@ class PlainPlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_player) {
 
         playerToolbar.setNavigationOnClickListener {
             getOnBackPressedDispatcher().onBackPressed()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
         }
     }
 
@@ -121,7 +142,21 @@ class PlainPlayerFragment : AbsPlayerFragment(R.layout.fragment_plain_player) {
         controlsFragment = whichFragment(R.id.playbackControlsFragment)
     }
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+                playerToolbar.menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
+            }
+        }
+    }
+
     override fun onDestroyView() {
+        Preferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroyView()
         _binding = null
     }

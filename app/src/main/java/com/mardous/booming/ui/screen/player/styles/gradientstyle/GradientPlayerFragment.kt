@@ -19,6 +19,7 @@ package com.mardous.booming.ui.screen.player.styles.gradientstyle
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -35,9 +36,10 @@ import com.mardous.booming.databinding.FragmentGradientPlayerBinding
 import com.mardous.booming.extensions.whichFragment
 import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
-class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_player), View.OnClickListener {
+class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_player), View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentGradientPlayerBinding? = null
     private val binding get() = _binding!!
@@ -61,12 +63,41 @@ class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_play
             insets
         }
         setupListeners()
+
+        Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+
+        binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+            View.GONE
+        }else {
+            View.VISIBLE
+        }
     }
 
     private fun setupListeners() {
         binding.openQueueButton.setOnClickListener(this)
         binding.showLyricsButton.setOnClickListener(this)
         binding.soundSettingsButton.setOnClickListener(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+
+        binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+            View.GONE
+        }else {
+            View.VISIBLE
+        }
     }
 
     override fun onClick(v: View) {
@@ -95,6 +126,7 @@ class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_play
     }
 
     override fun onDestroyView() {
+        Preferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroyView()
         _binding = null
     }
@@ -111,6 +143,24 @@ class GradientPlayerFragment : AbsPlayerFragment(R.layout.fragment_gradient_play
             binding.soundSettingsButton.iconButtonTintTarget(oldPrimaryTextColor, scheme.onSurfaceColor)
         ).also {
             it.addAll(playerControlsFragment.getTintTargets(scheme))
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+
+                binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+                    View.GONE
+                }else {
+                    View.VISIBLE
+                }
+            }
         }
     }
 

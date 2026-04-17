@@ -17,6 +17,7 @@
 
 package com.mardous.booming.ui.screen.player.styles.peekplayerstyle
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -36,12 +37,13 @@ import com.mardous.booming.extensions.launchAndRepeatWithViewLifecycle
 import com.mardous.booming.extensions.whichFragment
 import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
 /**
  * @author Christians M. A. (mardous)
  */
-class PeekPlayerFragment : AbsPlayerFragment(R.layout.fragment_peek_player) {
+class PeekPlayerFragment : AbsPlayerFragment(R.layout.fragment_peek_player), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentPeekPlayerBinding? = null
     private val binding get() = _binding!!
@@ -94,11 +96,29 @@ class PeekPlayerFragment : AbsPlayerFragment(R.layout.fragment_peek_player) {
                 }
             }
         }
+
+        Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+        playerToolbar.menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
     }
 
     private fun setupToolbar() {
         playerToolbar.setNavigationOnClickListener {
             getOnBackPressedDispatcher().onBackPressed()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
         }
     }
 
@@ -135,7 +155,21 @@ class PeekPlayerFragment : AbsPlayerFragment(R.layout.fragment_peek_player) {
         }
     }
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+                playerToolbar.menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
+            }
+        }
+    }
+
     override fun onDestroyView() {
+        Preferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroyView()
         _binding = null
     }

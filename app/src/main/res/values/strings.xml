@@ -783,6 +783,8 @@
     <string name="prefer_album_artist_name_summary">Shows the Album-artist\'s name instead of Song-artist\'s name (if available).</string>
     <string name="player_blur_intensity_title">Blur intensity</string>
     <string name="player_blur_intensity_summary">Adjust how strong the background blur appears in the Blur theme. Lower values may improve performance.</string>
+    <string name="hide_covers_title">Hide covers</string>
+    <string name="hide_covers_summary">Hide the album cover in the player</string>
 
     <!-- Playback preferences -->
     <string name="play_on_startup_title">Play on startup</string>

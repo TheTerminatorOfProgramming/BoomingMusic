@@ -462,6 +462,10 @@ object Preferences : KoinComponent {
         get() = preferences.getBoolean(DISPLAY_NEXT_SONG, true)
         set(value) = preferences.edit { putBoolean(DISPLAY_NEXT_SONG, value) }
 
+    var isHideCovers: Boolean
+        get() = preferences.getBoolean(HIDE_COVERS, false)
+        set(value) = preferences.edit { putBoolean(HIDE_COVERS, value) }
+
     fun SharedPreferences.nullString(key: String): String? = getString(key, null)
 
     fun SharedPreferences.requireString(key: String, defaultValue: String): String =
@@ -645,3 +649,4 @@ const val LOCKED_QUEUE = "locked_queue"
 const val LOCKED_PLAYLISTS = "locked_playlists"
 const val QUEUE_HEIGHT = "queue_height"
 const val LASTFM_LOGIN = "lastfm_login"
+const val HIDE_COVERS = "hide_covers"

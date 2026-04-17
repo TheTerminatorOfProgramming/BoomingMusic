@@ -44,6 +44,7 @@ import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
 import com.mardous.booming.ui.component.views.getPlaceholderDrawable
 import com.mardous.booming.util.DISPLAY_NEXT_SONG
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
 /**
@@ -91,9 +92,25 @@ class FullCoverPlayerFragment : AbsPlayerFragment(R.layout.fragment_full_cover_p
             }
         }
         Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+        playerToolbar?.menu?.findItem(R.id.action_show_lyrics)?.isVisible = !Preferences.isHideCovers
     }
 
     override fun onPrepareViewGestures(view: View) {}
+
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+    }
 
     private fun setupListeners() {
         binding.nextSongText.setOnClickListener(this)
@@ -120,6 +137,8 @@ class FullCoverPlayerFragment : AbsPlayerFragment(R.layout.fragment_full_cover_p
     override fun onMenuInflated(menu: Menu) {
         super.onMenuInflated(menu)
         menu.removeItem(R.id.action_favorite)
+
+        menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
     }
 
     override fun onCreateChildFragments() {
@@ -162,9 +181,17 @@ class FullCoverPlayerFragment : AbsPlayerFragment(R.layout.fragment_full_cover_p
         _binding = null
     }
 
-    override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String?) {
-        if (key == DISPLAY_NEXT_SONG) {
-            setupNextSongVisibility()
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            DISPLAY_NEXT_SONG-> setupNextSongVisibility()
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+                playerToolbar?.menu?.findItem(R.id.action_show_lyrics)?.isVisible = !Preferences.isHideCovers
+            }
         }
     }
 }

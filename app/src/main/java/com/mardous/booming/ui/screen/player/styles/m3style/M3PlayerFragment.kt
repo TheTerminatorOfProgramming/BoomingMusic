@@ -18,6 +18,7 @@
 package com.mardous.booming.ui.screen.player.styles.m3style
 
 import android.animation.AnimatorSet
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -41,12 +42,13 @@ import com.mardous.booming.extensions.getOnBackPressedDispatcher
 import com.mardous.booming.extensions.whichFragment
 import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
 /**
  * @author Christians M. A. (mardous)
  */
-class M3PlayerFragment : AbsPlayerFragment(R.layout.fragment_m3_player) {
+class M3PlayerFragment : AbsPlayerFragment(R.layout.fragment_m3_player), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentM3PlayerBinding? = null
     private val binding get() = _binding!!
@@ -79,6 +81,20 @@ class M3PlayerFragment : AbsPlayerFragment(R.layout.fragment_m3_player) {
             v.updatePadding(left = displayCutout.left, right = displayCutout.right)
             WindowInsetsCompat.CONSUMED
         }
+
+        Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+
+        binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+            View.GONE
+        }else {
+            View.VISIBLE
+        }
     }
 
     private fun setupActions() {
@@ -87,6 +103,21 @@ class M3PlayerFragment : AbsPlayerFragment(R.layout.fragment_m3_player) {
         setViewAction(binding.showLyricsButton, NowPlayingAction.Lyrics)
         setViewAction(binding.sleepTimerAction, NowPlayingAction.SleepTimer)
         setViewAction(binding.addToPlaylistAction, NowPlayingAction.AddToPlaylist)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+
+        binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+            View.GONE
+        }else {
+            View.VISIBLE
+        }
     }
 
     private fun setupToolbar() {
@@ -134,11 +165,30 @@ class M3PlayerFragment : AbsPlayerFragment(R.layout.fragment_m3_player) {
         }
     }
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+
+                binding.showLyricsButton.visibility = if (Preferences.isHideCovers) {
+                    View.GONE
+                }else {
+                    View.VISIBLE
+                }
+            }
+        }
+    }
+
     override fun onIsFavoriteChanged(isFavorite: Boolean, withAnimation: Boolean) {
         popupMenu?.menu?.setIsFavorite(isFavorite, false)
     }
 
     override fun onDestroyView() {
+        Preferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroyView()
         _binding = null
     }

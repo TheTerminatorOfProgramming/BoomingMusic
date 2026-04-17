@@ -1,6 +1,7 @@
 package com.mardous.booming.ui.screen.player.styles.expressivestyle
 
 import android.animation.AnimatorSet
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -31,10 +32,11 @@ import com.mardous.booming.extensions.whichFragment
 import com.mardous.booming.ui.component.base.AbsPlayerControlsFragment
 import com.mardous.booming.ui.component.base.AbsPlayerFragment
 import com.mardous.booming.ui.component.preferences.dialog.ExtraInfoPreferenceDialog
+import com.mardous.booming.util.HIDE_COVERS
 import com.mardous.booming.util.Preferences
 
 class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_player),
-    View.OnClickListener, View.OnLongClickListener {
+    View.OnClickListener, View.OnLongClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentExpressivePlayerBinding? = null
     private val binding get() = _binding!!
@@ -119,6 +121,14 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
             v.updatePadding(left = displayCutout.left, right = displayCutout.right)
             WindowInsetsCompat.CONSUMED
         }
+
+        Preferences.registerOnSharedPreferenceChangeListener(this)
+
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
     }
 
     private fun setupActions() {
@@ -132,6 +142,15 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
         binding.soundSettingsButton?.let { setViewAction(it, NowPlayingAction.SoundSettings) }
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+            View.INVISIBLE
+        }else {
+            View.VISIBLE
+        }
+    }
+
     private fun setupToolbar() {
         playerToolbar.setNavigationOnClickListener {
             getOnBackPressedDispatcher().onBackPressed()
@@ -142,6 +161,19 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
         when (view) {
             binding.repeatButton -> playerViewModel.cycleRepeatMode()
             binding.shuffleButton -> playerViewModel.toggleShuffleMode()
+        }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
+        when (key) {
+            HIDE_COVERS->{
+                binding.playerAlbumCoverFragment.visibility = if (Preferences.isHideCovers) {
+                    View.INVISIBLE
+                }else {
+                    View.VISIBLE
+                }
+                playerToolbar.menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
+            }
         }
     }
 
@@ -161,6 +193,8 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
         menu.removeItem(R.id.action_playing_queue)
         menu.findItem(R.id.action_show_lyrics)?.isVisible = isLandscape()
         menu.findItem(R.id.action_sound_settings)?.isVisible = isLandscape()
+
+        menu.findItem(R.id.action_show_lyrics).isVisible = !Preferences.isHideCovers
     }
 
     override fun onCreateChildFragments() {
@@ -241,6 +275,7 @@ class ExpressivePlayerFragment : AbsPlayerFragment(R.layout.fragment_expressive_
     }
 
     override fun onDestroyView() {
+        Preferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroyView()
         _binding = null
     }
