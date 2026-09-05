@@ -48,7 +48,7 @@
         tools:ignore="UnusedAttribute">
 
         <activity
-            android:name=".ui.screen.MainActivity"
+            android:name=".MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
             android:theme="@style/Theme.Booming.SplashScreen">

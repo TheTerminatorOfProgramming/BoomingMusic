@@ -65,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.session.MediaController
+import com.mardous.booming.MainActivity
 import com.mardous.booming.MediaControllerOwner
 import com.mardous.booming.R
 import com.mardous.booming.core.model.player.ProgressState

@@ -30,13 +30,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.mardous.booming.MainActivity
 import com.mardous.booming.R
 import com.mardous.booming.core.MediaEventBus
 import com.mardous.booming.core.model.MediaEvent
 import com.mardous.booming.extensions.applyWindowInsets
 import com.mardous.booming.extensions.dip
 import com.mardous.booming.extensions.isLandscape
-import com.mardous.booming.ui.screen.MainActivity
 import com.mardous.booming.ui.screen.library.LibraryViewModel
 import com.mardous.booming.ui.screen.player.PlayerViewModel
 import com.mardous.booming.util.OPEN_ON_PLAY

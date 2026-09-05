@@ -13,9 +13,9 @@ import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionSendBroadcast
 import androidx.glance.appwidget.action.actionStartService
+import com.mardous.booming.MainActivity
 import com.mardous.booming.core.appwidgets.config.SongSource
 import com.mardous.booming.playback.PlaybackService
-import com.mardous.booming.ui.screen.MainActivity
 import androidx.glance.appwidget.action.actionStartActivity as actionStartActivityIntent
 
 fun playbackAction(context: Context, mediaKeyCode: Int): Action {

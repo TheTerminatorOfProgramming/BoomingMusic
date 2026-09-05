@@ -51,6 +51,7 @@ import coil3.size.Scale
 import com.commit451.coiltransformations.BlurTransformation
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.button.MaterialButton
+import com.mardous.booming.MainActivity
 import com.mardous.booming.R
 import com.mardous.booming.core.MediaEventBus
 import com.mardous.booming.core.model.MediaEvent
@@ -82,7 +83,6 @@ import com.mardous.booming.ui.component.menu.onSongMenu
 import com.mardous.booming.ui.dialogs.WebSearchDialog
 import com.mardous.booming.ui.dialogs.playlists.AddToPlaylistDialog
 import com.mardous.booming.ui.dialogs.songs.DeleteSongsDialog
-import com.mardous.booming.ui.screen.MainActivity
 import com.mardous.booming.ui.screen.equalizer.EqualizerFragment
 import com.mardous.booming.ui.screen.equalizer.EqualizerFragmentArgs
 import com.mardous.booming.ui.screen.library.LibraryViewModel
