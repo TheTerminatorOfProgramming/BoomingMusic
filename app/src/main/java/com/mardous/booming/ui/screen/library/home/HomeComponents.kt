@@ -302,7 +302,6 @@ private fun AlbumCarousel(
     val carouselState = rememberCarouselState { albums.size }
     HorizontalCenteredHeroCarousel(
         state = carouselState,
-        maxItemWidth = 260.dp,
         itemSpacing = 8.dp,
         contentPadding = PaddingValues(horizontal = 8.dp),
         modifier = Modifier
@@ -334,7 +333,6 @@ private fun AlbumCarouselItem(
 ) {
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
         modifier = modifier
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -346,7 +344,7 @@ private fun AlbumCarouselItem(
                 targetState = isCurrentItem,
                 transitionSpec = {
                     fadeIn(animationSpec = tween(300))
-                        .togetherWith(fadeOut(animationSpec = tween(300)))
+                        .togetherWith(fadeOut(animationSpec = tween(200)))
                 },
                 contentAlignment = Alignment.BottomCenter
             ) { canShowItemInfo ->
@@ -366,9 +364,10 @@ private fun AlbumCarouselItem(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
+                                .padding(horizontal = 16.dp)
                                 .padding(bottom = 16.dp)
                         ) {
-                            Column(Modifier.fillMaxWidth(0.7f)) {
+                            Column(Modifier.weight(1f)) {
                                 Text(
                                     text = album.name,
                                     style = MaterialTheme.typography.bodyMedium,
