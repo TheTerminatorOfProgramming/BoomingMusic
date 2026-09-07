@@ -23,6 +23,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -39,12 +41,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
@@ -66,10 +66,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -91,6 +89,7 @@ import com.mardous.booming.extensions.showToast
 import com.mardous.booming.extensions.utilities.buildInfoString
 import com.mardous.booming.playback.QUEUE_DEBOUNCE
 import com.mardous.booming.ui.component.compose.AnimatedEqBars
+import com.mardous.booming.ui.component.compose.BottomSheetDialogSurface
 import com.mardous.booming.ui.component.compose.MediaImage
 import com.mardous.booming.ui.component.compose.ObserveAsEvent
 import com.mardous.booming.ui.component.compose.SmallHeader
@@ -199,148 +198,136 @@ fun QueueScreen(
             }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .nestedScroll(rememberNestedScrollInteropConnection())
+    BottomSheetDialogSurface(
+        title = {
+            SmallHeader(
+                title = currentSong.title,
+                subtitle = currentSong.displayArtistName(),
+                imageModel = currentSong,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                FilledTonalToggleButton(
+                    checked = shuffleMode,
+                    onCheckedChange = { checked ->
+                        toggleHapticFeedback(checked)
+                        shouldLocateCurrentTrackOnUpdate = true
+                        playerViewModel.toggleShuffleMode()
+                    },
+                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_shuffle_24dp),
+                        contentDescription = stringResource(R.string.action_toggle_shuffle)
+                    )
+                }
+
+                FilledTonalToggleButton(
+                    checked = repeatMode != Player.REPEAT_MODE_OFF,
+                    onCheckedChange = { checked ->
+                        toggleHapticFeedback(checked)
+                        playerViewModel.cycleRepeatMode()
+                    },
+                    shapes = ButtonGroupDefaults.connectedMiddleButtonShapes(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        painter = when (repeatMode) {
+                            Player.REPEAT_MODE_ALL -> painterResource(R.drawable.ic_repeat_24dp)
+                            Player.REPEAT_MODE_ONE -> painterResource(R.drawable.ic_repeat_one_24dp)
+                            else -> painterResource(R.drawable.ic_repeat_24dp)
+                        },
+                        contentDescription = stringResource(R.string.action_cycle_repeat)
+                    )
+                }
+
+                FilledTonalToggleButton(
+                    checked = queueLocked,
+                    onCheckedChange = { checked ->
+                        toggleHapticFeedback(checked)
+                        // TODO migrate to DataStore Preferences
+                        sharedPreferences.edit {
+                            putBoolean(LOCKED_QUEUE, checked)
+                        }
+                    },
+                    shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        painter = if (queueLocked) {
+                            painterResource(R.drawable.ic_lock_24dp)
+                        } else {
+                            painterResource(R.drawable.ic_lock_open_24dp)
+                        },
+                        contentDescription = stringResource(R.string.action_toggle_queue_lock)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(themeColors.surfaceContainerLowest.copy(alpha = .6f))
+                    .padding(vertical = 12.dp)
+                    .padding(start = 16.dp, end = 8.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_queue_music_24dp),
+                    tint = themeColors.secondary,
+                    contentDescription = null
+                )
+
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.up_next),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = themeColors.secondary,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+
+                    Text(
+                        text = buildInfoString(
+                            playQueue.songCountStr(context),
+                            playQueue.songsDurationStr()
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = themeColors.onSurfaceVariant
+                    )
+                }
+
+                OverflowMenu(
+                    items = listOf(
+                        MenuItem.Button.DropDown(
+                            icon = painterResource(R.drawable.ic_playlist_add_24dp),
+                            text = stringResource(R.string.action_add_to_playlist),
+                            onClick = { onAddToPlaylistClick(playQueue) }
+                        ),
+                        MenuItem.Button.DropDown(
+                            icon = painterResource(R.drawable.ic_clear_all_24dp),
+                            text = stringResource(R.string.clear_queue),
+                            dangerous = true,
+                            onClick = { playerViewModel.clearQueue() }
+                        ),
+                    ),
+                    colors = MenuDefaults.dropDownMenuColors(themeColors.surfaceContainerHigh)
+                )
+            }
+        },
+        headingContentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 8.dp)
     ) {
-        BottomSheetDefaults.DragHandle(
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        SmallHeader(
-            title = currentSong.title,
-            subtitle = currentSong.displayArtistName(),
-            imageModel = currentSong,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            FilledTonalToggleButton(
-                checked = shuffleMode,
-                onCheckedChange = { checked ->
-                    toggleHapticFeedback(checked)
-                    shouldLocateCurrentTrackOnUpdate = true
-                    playerViewModel.toggleShuffleMode()
-                },
-                shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_shuffle_24dp),
-                    contentDescription = stringResource(R.string.action_toggle_shuffle)
-                )
-            }
-
-            FilledTonalToggleButton(
-                checked = repeatMode != Player.REPEAT_MODE_OFF,
-                onCheckedChange = { checked ->
-                    toggleHapticFeedback(checked)
-                    playerViewModel.cycleRepeatMode()
-                },
-                shapes = ButtonGroupDefaults.connectedMiddleButtonShapes(),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    painter = when(repeatMode) {
-                        Player.REPEAT_MODE_ALL -> painterResource(R.drawable.ic_repeat_24dp)
-                        Player.REPEAT_MODE_ONE -> painterResource(R.drawable.ic_repeat_one_24dp)
-                        else -> painterResource(R.drawable.ic_repeat_24dp)
-                    },
-                    contentDescription = stringResource(R.string.action_cycle_repeat)
-                )
-            }
-
-            FilledTonalToggleButton(
-                checked = queueLocked,
-                onCheckedChange = { checked ->
-                    toggleHapticFeedback(checked)
-                    // TODO migrate to DataStore Preferences
-                    sharedPreferences.edit {
-                        putBoolean(LOCKED_QUEUE, checked)
-                    }
-                },
-                shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    painter = if (queueLocked) {
-                        painterResource(R.drawable.ic_lock_24dp)
-                    } else {
-                        painterResource(R.drawable.ic_lock_open_24dp)
-                    },
-                    contentDescription = stringResource(R.string.action_toggle_queue_lock))
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(themeColors.surfaceContainerLowest.copy(alpha = .6f))
-                .padding(vertical = 12.dp)
-                .padding(start = 16.dp, end = 8.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.ic_queue_music_24dp),
-                tint = themeColors.secondary,
-                contentDescription = null
-            )
-
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.up_next),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = themeColors.secondary,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
-                )
-
-                Text(
-                    text = buildInfoString(
-                        playQueue.songCountStr(context),
-                        playQueue.songsDurationStr()
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = themeColors.onSurfaceVariant
-                )
-            }
-
-            OverflowMenu(
-                items = listOf(
-                    MenuItem.Button.DropDown(
-                        icon = painterResource(R.drawable.ic_playlist_add_24dp),
-                        text = stringResource(R.string.action_add_to_playlist),
-                        onClick = { onAddToPlaylistClick(playQueue) }
-                    ),
-                    MenuItem.Button.DropDown(
-                        icon = painterResource(R.drawable.ic_clear_all_24dp),
-                        text = stringResource(R.string.clear_queue),
-                        dangerous = true,
-                        onClick = { playerViewModel.clearQueue() }
-                    ),
-                ),
-                colors = MenuDefaults.dropDownMenuColors(themeColors.surfaceContainerHigh)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         Box {
             LazyColumnScrollbar(
                 state = listState,
@@ -519,8 +506,8 @@ fun QueueScreen(
 
             androidx.compose.animation.AnimatedVisibility(
                 visible = showLocateCurrentTrack,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it },
+                enter = slideInVertically { it } + fadeIn(),
+                exit = slideOutVertically { it } + fadeOut(),
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter)

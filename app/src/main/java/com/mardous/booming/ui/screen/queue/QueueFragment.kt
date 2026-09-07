@@ -33,7 +33,6 @@ import com.mardous.booming.extensions.getShareSongIntent
 import com.mardous.booming.extensions.launchAndRepeatWithViewLifecycle
 import com.mardous.booming.extensions.navigation.songDetailArgs
 import com.mardous.booming.extensions.toChooser
-import com.mardous.booming.ui.component.compose.BottomSheetDialogSurface
 import com.mardous.booming.ui.dialogs.playlists.AddToPlaylistDialog
 import com.mardous.booming.ui.dialogs.songs.DeleteSongsDialog
 import com.mardous.booming.ui.screen.player.PlayerViewModel
@@ -62,29 +61,27 @@ class QueueFragment : BottomSheetDialogFragment() {
             )
             setContent {
                 BoomingMusicTheme {
-                    BottomSheetDialogSurface {
-                        QueueScreen(
-                            onAddToPlaylistClick = { songs ->
-                                AddToPlaylistDialog.create(songs)
-                                    .show(childFragmentManager, "ADD_TO_PLAYLIST")
-                            },
-                            onDeleteSongClick = { song ->
-                                DeleteSongsDialog.create(song)
-                                    .show(childFragmentManager, "DELETE_SONGS")
-                            },
-                            onShareClick = { song ->
-                                startActivity(
-                                    requireContext()
-                                        .getShareSongIntent(song)
-                                        .toChooser(getString(R.string.action_share))
-                                )
-                            },
-                            onDetailsClick = { song ->
-                                findNavController()
-                                    .navigate(R.id.nav_song_details, songDetailArgs(song))
-                            }
-                        )
-                    }
+                    QueueScreen(
+                        onAddToPlaylistClick = { songs ->
+                            AddToPlaylistDialog.create(songs)
+                                .show(childFragmentManager, "ADD_TO_PLAYLIST")
+                        },
+                        onDeleteSongClick = { song ->
+                            DeleteSongsDialog.create(song)
+                                .show(childFragmentManager, "DELETE_SONGS")
+                        },
+                        onShareClick = { song ->
+                            startActivity(
+                                requireContext()
+                                    .getShareSongIntent(song)
+                                    .toChooser(getString(R.string.action_share))
+                            )
+                        },
+                        onDetailsClick = { song ->
+                            findNavController()
+                                .navigate(R.id.nav_song_details, songDetailArgs(song))
+                        }
+                    )
                 }
             }
         }

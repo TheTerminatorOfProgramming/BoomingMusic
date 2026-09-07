@@ -35,10 +35,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,13 +55,11 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -168,120 +164,110 @@ class SongDetailFragment : BottomSheetDialogFragment() {
         }
 
         BottomSheetDialogSurface {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .nestedScroll(rememberNestedScrollInteropConnection())
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
-                BottomSheetDefaults.DragHandle(
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                ) {
-                    item {
-                        // Header containing basic song's info
-                        SmallHeader(
-                            title = uiState.info.title.orEmpty(),
-                            subtitle = uiState.info.artist,
-                            trailingContent = {
-                                AnimatedVisibility(
-                                    visible = uiState.isLoading,
-                                    modifier = Modifier.padding(start = 8.dp)
-                                ) {
-                                    CircularWavyProgressIndicator(
-                                        stroke = Stroke(
-                                            width = with(LocalDensity.current) { 3.dp.toPx() },
-                                            cap = StrokeCap.Round
-                                        ),
-                                        trackStroke = Stroke(
-                                            width = with(LocalDensity.current) { 3.dp.toPx() },
-                                            cap = StrokeCap.Round
-                                        ),
-                                        wavelength = 10.dp,
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                }
-                            },
-                            imageModel = song,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                item {
+                    // Header containing basic song's info
+                    SmallHeader(
+                        title = uiState.info.title.orEmpty(),
+                        subtitle = uiState.info.artist,
+                        trailingContent = {
+                            AnimatedVisibility(
+                                visible = uiState.isLoading,
+                                modifier = Modifier.padding(start = 8.dp)
+                            ) {
+                                CircularWavyProgressIndicator(
+                                    stroke = Stroke(
+                                        width = with(LocalDensity.current) { 3.dp.toPx() },
+                                        cap = StrokeCap.Round
+                                    ),
+                                    trackStroke = Stroke(
+                                        width = with(LocalDensity.current) { 3.dp.toPx() },
+                                        cap = StrokeCap.Round
+                                    ),
+                                    wavelength = 10.dp,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        },
+                        imageModel = song,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
-                    item {
-                        // Related actions
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                item {
+                    // Related actions
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilledTonalButton(
+                            onClick = onLyricsEditorClick,
+                            enabled = uiState.isLoading.not(),
+                            modifier = Modifier.weight(1f)
                         ) {
-                            FilledTonalButton(
-                                onClick = onLyricsEditorClick,
-                                enabled = uiState.isLoading.not(),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_lyrics_outline_24dp),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.action_lyrics_editor))
-                            }
+                            Icon(
+                                painter = painterResource(R.drawable.ic_lyrics_outline_24dp),
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.action_lyrics_editor))
+                        }
 
-                            Button(
-                                onClick = onTagEditorClick,
-                                enabled = uiState.isLoading.not(),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_edit_24dp),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.action_tag_editor))
-                            }
+                        Button(
+                            onClick = onTagEditorClick,
+                            enabled = uiState.isLoading.not(),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_edit_24dp),
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.action_tag_editor))
                         }
                     }
+                }
 
-                    if (!uiState.isLoading || uiState.info != SongInfo.Empty) {
-                        if (uiState.isSuccess) {
-                            // Content sections
-                            if (!uiState.info.isMissingMetadata) {
-                                item {
-                                    MetadataInfoSection(
-                                        songInfo = uiState.info,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
+                if (!uiState.isLoading || uiState.info != SongInfo.Empty) {
+                    if (uiState.isSuccess) {
+                        // Content sections
+                        if (!uiState.info.isMissingMetadata) {
                             item {
-                                PlayInfoSection(
-                                    songInfo = uiState.info,
-                                    onResetPlaybackStacks = {
-                                        haptics.performHapticFeedback(HapticFeedbackType.KeyboardTap)
-                                        viewModel.resetPlaybackStats(context, song)
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            item {
-                                FileInfoSection(
+                                MetadataInfoSection(
                                     songInfo = uiState.info,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                        } else {
-                            item {
-                                ErrorView(
-                                    iconRes = R.drawable.ic_error_24dp,
-                                    text = stringResource(R.string.could_not_load_the_song_information),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
+                        }
+                        item {
+                            PlayInfoSection(
+                                songInfo = uiState.info,
+                                onResetPlaybackStacks = {
+                                    haptics.performHapticFeedback(HapticFeedbackType.KeyboardTap)
+                                    viewModel.resetPlaybackStats(context, song)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        item {
+                            FileInfoSection(
+                                songInfo = uiState.info,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    } else {
+                        item {
+                            ErrorView(
+                                iconRes = R.drawable.ic_error_24dp,
+                                text = stringResource(R.string.could_not_load_the_song_information),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }
