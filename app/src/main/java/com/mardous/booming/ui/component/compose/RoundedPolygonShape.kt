@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 
@@ -43,6 +44,28 @@ class RoundedPolygonShape(
         val radius = size.minDimension / 2f
         matrix.translate(size.width / 2f, size.height / 2f)
         matrix.scale(radius, radius)
+        path.transform(matrix)
+        return Outline.Generic(path)
+    }
+}
+
+class MorphPolygonShape(
+    private val morph: Morph,
+    private val percentage: Float,
+    private val rotation: Float = 0f
+) : Shape {
+    private val matrix = Matrix()
+
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        matrix.scale(size.width / 2f, size.height / 2f)
+        matrix.translate(1f, 1f)
+        matrix.rotateZ(rotation)
+
+        val path = morph.toPath(progress = percentage).asComposePath()
         path.transform(matrix)
         return Outline.Generic(path)
     }
